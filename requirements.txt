@@ -1,0 +1,7 @@
+Flask==2.3.3 
+flask-mysql==1.5.2
+flask_Cors==4.0.1
+
+
+
+
