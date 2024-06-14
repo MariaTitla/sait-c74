@@ -1,30 +1,28 @@
 from flask import Flask
-from app  import config
 from app.instancia_mysql import mysql
 
-
-
+import os
+import dotenv
 
 def create_app():
     app=Flask(__name__)
 
-   
-    #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:rosa54ROSA@localhost/saitutpdb'
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+   # cargamos las variables de entorno
+    dotenv.load_dotenv()  
+
+    # leemos las varaibles de entorno
+    usuariodb = os.getenv('USER')
+    passwd = os.getenv('PASSWD')
+    host=os.getenv('MYSQL_HOST')
+    db=os.getenv('MYSQL_DB')
+    puerto=os.getenv('MYSQL_DB')
+
+    app.config["MYSQL_DATABASE_HOSTNAME"]=host
+    app.config["MYSQL_DATABASE_USER"]= usuariodb  
+    app.config["MYSQL_DATABASE_PASSWORD"]=passwd  
+    app.config['MYSQL_DATABASE_DB']=db
+    app.config['MYSQL_DATABASE_PORT']=puerto 
     
-#  app.config['SQLALCHEMY_DATABASE_URI']=(
- #   'mysql+pymysql://USER:PASSWORD@/DATABASE_NAME?unix_socket=/cloudsql/PROJECT_ID:REGION:INSTANCE_NAME'
-#) 
-
-
-    app.config["MYSQL_DATABASE_HOSTNAME"]=config.MYSQL_HOST
-    app.config["MYSQL_DATABASE_USER"]=config.MYSQL_USER
-    app.config["MYSQL_DATABASE_PASSWORD"]=config.MYSQL_PASSWORD
-    app.config['MYSQL_DATABASE_DB']=config.MYSQL_DB
-    app.config['MYSQL_DATABASE_PORT']=config.MYSQL_PORT 
-    #app.config_class['MYSQL_DATABASE_CHARSET']=config.MYSQL_DATABASE_CHARSET
-
-    # Inicializa SQLAlchemy
     # Registrar Blueprints
     with app.app_context():
         from app.responsablesDepto.responsablesDepto import respon
@@ -55,4 +53,5 @@ def create_app():
         
         
         mysql.init_app(app)
+        print("usu",usuariodb)
         return app
