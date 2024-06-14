@@ -8,14 +8,14 @@ def create_app():
     app=Flask(__name__)
 
    # cargamos las variables de entorno
-    dotenv.load_dotenv()  
+    dotenv.load_dotenv(override=True)  
 
     # leemos las varaibles de entorno
     usuariodb = os.getenv('USER')
     passwd = os.getenv('PASSWD')
     host=os.getenv('MYSQL_HOST')
     db=os.getenv('MYSQL_DB')
-    puerto=os.getenv('MYSQL_DB')
+    puerto=int(os.getenv('MYSQL_PORT'))
 
     app.config["MYSQL_DATABASE_HOSTNAME"]=host
     app.config["MYSQL_DATABASE_USER"]= usuariodb  
