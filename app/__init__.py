@@ -16,7 +16,7 @@ dotenv.load_dotenv(override=True)
 
 # Inicializar SQLAlchemy
 db = SQLAlchemy()
-
+#conexion 
 def connect_tcp_socket() -> sqlalchemy.engine.base.Engine:
     """Initializes a TCP connection pool for a Cloud SQL instance of MySQL."""
     db_host = os.getenv("INSTANCE_HOST")  # e.g. '127.0.0.1'
