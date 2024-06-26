@@ -2,32 +2,55 @@ from flask import Flask
 from app.instancia_mysql import mysql
 
 import os
+import sqlalchemy
 import dotenv
 
+import os
+import sqlalchemy
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+import dotenv
+
+# Cargar las variables de entorno desde el archivo .env
+dotenv.load_dotenv(override=True)
+
+# Inicializar SQLAlchemy
+db = SQLAlchemy()
+
+def connect_tcp_socket() -> sqlalchemy.engine.base.Engine:
+    """Initializes a TCP connection pool for a Cloud SQL instance of MySQL."""
+    db_host = os.getenv("INSTANCE_HOST")  # e.g. '127.0.0.1'
+    db_user = os.getenv("DB_USER")  # e.g. 'my-db-user'
+    db_pass = os.getenv("DB_PASS")  # e.g. 'my-db-password'
+    db_name = os.getenv("DB_NAME")  # e.g. 'my-database'
+    db_port = os.getenv("DB_PORT")  # e.g. 3306
+
+    pool = sqlalchemy.create_engine(
+        sqlalchemy.engine.url.URL.create(
+            drivername="mysql+pymysql",
+            username=db_user,
+            password=db_pass,
+            host=db_host,
+            port=db_port,
+            database=db_name,
+        ),
+    )
+    return pool
+
 def create_app():
-    app=Flask(__name__)
+    app = Flask(__name__)
 
-   # cargamos las variables de entorno
-    dotenv.load_dotenv(override=True)  
+    # Configuración de SQLAlchemy para usar la conexión TCP
+    app.config['SQLALCHEMY_DATABASE_URI'] = str(connect_tcp_socket().url)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # leemos las varaibles de entorno
-    usuariodb = os.getenv('USER')
-    passwd = os.getenv('PASSWD')
-    host=os.getenv('MYSQL_HOST')
-    db=os.getenv('MYSQL_DB')
-    puerto=int(os.getenv('MYSQL_PORT'))
+    # Inicializar la aplicación con SQLAlchemy
+    db.init_app(app)
 
-    app.config["MYSQL_DATABASE_HOSTNAME"]=host
-    app.config["MYSQL_DATABASE_USER"]= usuariodb  
-    app.config["MYSQL_DATABASE_PASSWORD"]=passwd  
-    app.config['MYSQL_DATABASE_DB']=db
-    app.config['MYSQL_DATABASE_PORT']=puerto 
-    
     # Registrar Blueprints
     with app.app_context():
         from app.responsablesDepto.responsablesDepto import respon
         from app.paises.paises import pais
-
         from app.estados.estados import estado
         from app.municipios.municipios import municipio
         from app.direcciones.direcciones import direccion
@@ -37,7 +60,6 @@ def create_app():
         from app.empleados.empleados import empleado
         from app.usuarios.usuarios import usuario
         from app.roles.roles import rol
-
 
         app.register_blueprint(respon)
         app.register_blueprint(pais)
@@ -50,8 +72,5 @@ def create_app():
         app.register_blueprint(empleado)
         app.register_blueprint(usuario)
         app.register_blueprint(rol)
-        
-        
-        mysql.init_app(app)
-        print("usu",usuariodb)
+
         return app
