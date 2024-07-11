@@ -18,4 +18,4 @@ EXPOSE 8080
 ENV FLASK_APP=main.py
 
 # Comando para ejecutar la aplicación
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+CMD ["flask", "run"]
